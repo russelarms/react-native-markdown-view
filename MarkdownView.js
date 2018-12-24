@@ -17,6 +17,7 @@ import DefaultStyles from './styles'
 
 import type {
   ImageNode,
+  IframeNode,
   Rules,
   Styles,
 } from './types'
@@ -70,6 +71,13 @@ const DefaultRules : Rules = Object.freeze(mergeRules(
         width: capture[4] ? parseInt(capture[4]) : undefined,
         height: capture[5] ? parseInt(capture[5]) : undefined,
       })
+    },
+    iframe: {
+      order: SimpleMarkdown.defaultRules.em.order - 0.5,
+      match: inlineRegex(new RegExp("(?:<center[^>]*)(?:(?:\/>)|(?:>.*?<center>))")),
+      parse: (capture, parse, state): IframeNode => ({
+          text: capture,
+      }),
     }
   }
 ))

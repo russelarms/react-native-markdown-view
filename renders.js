@@ -6,6 +6,8 @@ import {
   Image,
   Text,
   View,
+  WebView,
+  Dimensions,
 } from 'react-native'
 
 import {
@@ -18,6 +20,7 @@ import type {
   EmptyNode,
   HeadingNode,
   ImageNode,
+  IframeNode,
   InlineContentNode,
   LinkNode,
   ListNode,
@@ -27,6 +30,11 @@ import type {
   RenderStyles,
 } from './types'
 
+const SCREEN = {
+  width: Dimensions.get('window').width,
+  height: Dimensions.get('window').height,
+};
+
 function renderImage(node: ImageNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles
   return (
@@ -35,6 +43,30 @@ function renderImage(node: ImageNode, output: OutputFunction, state: RenderState
     </View>
   )
 }
+
+function renderIframe(node: IframeNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
+  const {imageWrapper: wrapperStyle, image: imageStyle} = styles;
+  let htmlSrc = node.text.input;
+  htmlSrc = htmlSrc.replace("<center>", "");
+  htmlSrc = htmlSrc.replace("<center>", "");
+  const widthRegex = new RegExp("(width\\s*=\\s*[\"\'](.*?)[\"\'])");
+  htmlSrc = htmlSrc.replace(widthRegex, "width=\"98%\"");
+  const heightRegex = new RegExp("(height\\s*=\\s*[\"\'](.*?)[\"\'])");
+  htmlSrc = htmlSrc.replace(heightRegex, "height=\"98%\"");
+
+  return (
+    <View
+      key={state.key}
+      style={{ width: SCREEN.width, height:SCREEN.height / 2 }}>
+      <WebView
+        style={{ flex:1 }}
+        source={{ html: htmlSrc }}
+        originWhitelist={['*']}
+      />
+    </View>
+  )
+}
+
 
 function renderTableCell(cell, row, column, rowCount, columnCount, output, state, styles) {
   const cellStyle = [styles.tableCell]
@@ -117,6 +149,7 @@ function paddedSize(size, style) {
 }
 
 export default Object.freeze({
+  iframe: renderIframe,
   blockQuote: textContentRenderer('blockQuote'),
   br: (node: EmptyNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
     <Text key={state.key} style={styles.br}>

@@ -23,6 +23,10 @@ export type ImageNode = {
   height?: number,
 }
 
+export type IframeNode = {
+  text: object,
+}
+
 export type InlineContentNode = {
   content: InlineNode,
 }
