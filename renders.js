@@ -115,6 +115,9 @@ function paragraphRenderer() {
     if (node.content instanceof Array && node.content.length === 1 && node.content[0].type === 'image') {
       const imageNode : ImageNode = node.content[0]
       return renderImage(imageNode, output, state, styles)
+    } else if (node.content[0].type === 'iframe') {
+      const iframeNode : IframeNode = node.content[0];
+      return renderIframe(iframeNode, output, state, styles);
     } else {
       return renderText(node, output, state, styles)
     }
