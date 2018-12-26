@@ -84,7 +84,7 @@ function renderIframe(node: IframeNode, output: OutputFunction, state: RenderSta
     const result = (
       <View
         key={state.key}
-        style={{ width: SCREEN.width, height: height }}>
+        style={{ height }}>
         <WebView
           style={webViewStyles}
           source={{ html: htmlSrc }}
