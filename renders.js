@@ -16,6 +16,8 @@ import {
   Row,
 } from 'react-native-tabular-grid-markdown-view'
 
+import XMLParser from 'react-xml-parser'
+
 import type {
   EmptyNode,
   HeadingNode,
@@ -35,6 +37,10 @@ const SCREEN = {
   height: Dimensions.get('window').height,
 };
 
+const webViewStyles = {
+  flex: 1,
+}
+
 function renderImage(node: ImageNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles
   return (
@@ -49,17 +55,34 @@ function renderIframe(node: IframeNode, output: OutputFunction, state: RenderSta
   let htmlSrc = node.text.input;
   htmlSrc = htmlSrc.replace("<center>", "");
   htmlSrc = htmlSrc.replace("<center>", "");
+
+  const xml = new XMLParser().parseFromString(htmlSrc);
+  const iframeXmlNode = xml.getElementsByTagName('iframe');
+  let xmlWidth = 0;
+  let xmlHeight = 0;
+  let proportion = 0;
+  if (iframeXmlNode.attributes && (iframeXmlNode.attributes.width || iframeXmlNode.attributes.height)){
+    xmlWidth = iframeXmlNode.attributes.width;
+    xmlHeight = iframeXmlNode.attributes.height;
+    proportion = xmlHeight / xmlWidth;
+  }
+
   const widthRegex = new RegExp("(width\\s*=\\s*[\"\'](.*?)[\"\'])");
   htmlSrc = htmlSrc.replace(widthRegex, "width=\"98%\"");
   const heightRegex = new RegExp("(height\\s*=\\s*[\"\'](.*?)[\"\'])");
   htmlSrc = htmlSrc.replace(heightRegex, "height=\"98%\"");
 
+  let height = SCREEN.height / 2;
+  if (proportion){
+    height = SCREEN.width * proportion;
+  }
+
   return (
     <View
       key={state.key}
-      style={{ width: SCREEN.width, height:SCREEN.height / 2 }}>
+      style={{ width: SCREEN.width, height: height }}>
       <WebView
-        style={{ flex:1 }}
+        style={webViewStyles}
         source={{ html: htmlSrc }}
         originWhitelist={['*']}
       />
