@@ -53,41 +53,48 @@ function renderImage(node: ImageNode, output: OutputFunction, state: RenderState
 function renderIframe(node: IframeNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles;
   let htmlSrc = node.text.input;
-  htmlSrc = htmlSrc.replace("<center>", "");
-  htmlSrc = htmlSrc.replace("<center>", "");
+  try {
+    htmlSrc = htmlSrc.replace("<center>", "");
+    htmlSrc = htmlSrc.replace("<center>", "");
 
-  const xml = new XMLParser().parseFromString(htmlSrc);
-  const iframeXmlNode = xml.getElementsByTagName('iframe');
-  let xmlWidth = 0;
-  let xmlHeight = 0;
-  let proportion = 0;
-  if (iframeXmlNode.attributes && (iframeXmlNode.attributes.width || iframeXmlNode.attributes.height)){
-    xmlWidth = iframeXmlNode.attributes.width;
-    xmlHeight = iframeXmlNode.attributes.height;
-    proportion = xmlHeight / xmlWidth;
+    const xml = new XMLParser().parseFromString(htmlSrc);
+    const iframeXmlNode = xml.getElementsByTagName('iframe');
+    let xmlWidth = 0;
+    let xmlHeight = 0;
+    let proportion = 0;
+    if (Array.isArray(iframeXmlNode) && iframeXmlNode.length > 0 &&  iframeXmlNode[0].attributes 
+         && (iframeXmlNode[0].attributes.width || iframeXmlNode[0].attributes.height)){
+      xmlWidth = iframeXmlNode[0].attributes.width;
+      xmlHeight = iframeXmlNode[0].attributes.height;
+      proportion = xmlHeight / xmlWidth;
+    }
+
+    const widthRegex = new RegExp("(width\\s*=\\s*[\"\'](.*?)[\"\'])");
+    htmlSrc = htmlSrc.replace(widthRegex, "width=\"98%\"");
+    const heightRegex = new RegExp("(height\\s*=\\s*[\"\'](.*?)[\"\'])");
+    htmlSrc = htmlSrc.replace(heightRegex, "height=\"98%\"");
+
+    let height = SCREEN.height / 2;
+    if (proportion){
+      height = SCREEN.width * proportion;
+    }
+
+    const result = (
+      <View
+        key={state.key}
+        style={{ width: SCREEN.width, height: height }}>
+        <WebView
+          style={webViewStyles}
+          source={{ html: htmlSrc }}
+          originWhitelist={['*']}
+        />
+      </View>
+    )
+    return result;
+  } catch (e){
+    console.log(e);
+    return <View/>;
   }
-
-  const widthRegex = new RegExp("(width\\s*=\\s*[\"\'](.*?)[\"\'])");
-  htmlSrc = htmlSrc.replace(widthRegex, "width=\"98%\"");
-  const heightRegex = new RegExp("(height\\s*=\\s*[\"\'](.*?)[\"\'])");
-  htmlSrc = htmlSrc.replace(heightRegex, "height=\"98%\"");
-
-  let height = SCREEN.height / 2;
-  if (proportion){
-    height = SCREEN.width * proportion;
-  }
-
-  return (
-    <View
-      key={state.key}
-      style={{ width: SCREEN.width, height: height }}>
-      <WebView
-        style={webViewStyles}
-        source={{ html: htmlSrc }}
-        originWhitelist={['*']}
-      />
-    </View>
-  )
 }
 
 
