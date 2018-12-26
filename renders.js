@@ -41,6 +41,10 @@ const webViewStyles = {
   flex: 1,
 }
 
+function replaceAll(string, search, replacement) {
+  return string.replace(new RegExp(search, 'g'), replacement);
+};
+
 function renderImage(node: ImageNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles
   return (
@@ -54,9 +58,7 @@ function renderIframe(node: IframeNode, output: OutputFunction, state: RenderSta
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles;
   let htmlSrc = node.text.input;
   try {
-    htmlSrc = htmlSrc.replace("<center>", "");
-    htmlSrc = htmlSrc.replace("<center>", "");
-
+    htmlSrc = replaceAll(htmlSrc, "<center>", "");
     const xml = new XMLParser().parseFromString(htmlSrc);
     const iframeXmlNode = xml.getElementsByTagName('iframe');
     let xmlWidth = 0;
