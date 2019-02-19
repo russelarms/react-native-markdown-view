@@ -74,7 +74,7 @@ const DefaultRules : Rules = Object.freeze(mergeRules(
     },
     iframe: {
       order: SimpleMarkdown.defaultRules.em.order - 0.5,
-      match: inlineRegex(new RegExp("(?:<center[^>]*)(?:(?:\/>)|(?:>.*?<center>))")),
+      match: inlineRegex(new RegExp("(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))")),
       parse: (capture, parse, state): IframeNode => ({
           text: capture,
       }),
